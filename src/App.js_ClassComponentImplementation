@@ -13,7 +13,7 @@ export default class App extends Component {
             input:''
         }
     }
-
+    // when app loads, we need to listen to the database and fetch todos and also need to fetch new todos as they get added/removed
     componentDidMount(){
         // this code here... fires when the app.js loads
     db.collection('todos').orderBy('timestamp','desc').onSnapshot(snapshot=>{
