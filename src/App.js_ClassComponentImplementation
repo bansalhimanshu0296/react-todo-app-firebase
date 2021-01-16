@@ -1,0 +1,64 @@
+import React, { Component } from 'react'
+import './App.css';
+import {Button, FormControl, InputLabel, Input, List} from '@material-ui/core';
+import Todo from './Todo';
+import db from './Firebase'
+import firebase from "firebase";
+
+export default class App extends Component {
+    constructor(props){
+        super(props);
+        this.state={
+            todos:[],
+            input:''
+        }
+    }
+
+    componentDidMount(){
+        // this code here... fires when the app.js loads
+    db.collection('todos').orderBy('timestamp','desc').onSnapshot(snapshot=>{
+        let tTodos = snapshot.docs.map(doc=>doc.data().task)
+        this.setState({todos:tTodos});
+      })
+    }
+
+    addTodo = (event) =>{
+        // this will fire off when we click the button
+        event.preventDefault(); // will stop REFRESH
+    
+        db.collection('todos').add({
+          task:this.state.input,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+    
+        this.setState({input:''}); //will clear input after hitting todo
+      };
+
+
+    render() {
+        console.log("xxxxxx");
+        return (
+            <div className="App">
+                <h1>Hello World!</h1>
+                <form>
+                    {/* <input value={input} onChange={event=>setInput(event.target.value)}/> */}
+                    <FormControl>
+                        <InputLabel> Write a Todo </InputLabel>
+                        <Input value={this.state.input} onChange={event=>this.setState({input:event.target.value})}/>
+                    </FormControl>
+                    <Button variant="contained" onClick={this.addTodo} type="submit" disabled={!this.state.input} color="primary">
+                        Add Todo
+                    </Button>
+                    {/* <button onClick={addTodo}>Add Todo</button> */}
+                </form>
+                <List>
+                    {
+                        this.state.todos.map(todo =>(
+                            <Todo text={todo}/>
+                        ))
+                    }
+                </List>
+            </div>
+        )
+    }
+}
